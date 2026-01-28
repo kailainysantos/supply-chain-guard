@@ -1,0 +1,10 @@
+services:
+  logistics_db:
+    image: postgres:13
+    container_name: logistics_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
