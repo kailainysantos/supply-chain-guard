@@ -2,52 +2,66 @@ import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine
 
-# Configuração visual da página
-st.set_page_config(page_title="SupplyChainGuard Dashboard", layout="wide")
+# Configuração da página e ícone
+st.set_page_config(page_title="SupplyChainGuard | Auditoria", layout="wide", page_icon="🛡️")
 
-# Conexão com o banco (Docker)
+# Estilo para as métricas e fundo
+st.markdown("""
+    <style>
+    .main { background-color: #0e1117; }
+    [data-testid="stMetricValue"] { color: #00ffcc !important; }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Conexão com o Banco no Docker
 engine = create_engine('postgresql://admin:admin_password@localhost:5432/postgres')
 
 def load_data():
-    # Busca o histórico de auditoria
-    df_hist = pd.read_sql('SELECT * FROM tb_historico_qualidade ORDER BY data_execucao DESC', engine)
-    # Busca os dados limpos (Gold)
-    df_gold = pd.read_sql('SELECT * FROM gold_logistica_limpa', engine)
+    # Histórico para o gráfico e dados limpos para a tabela
+    df_hist = pd.read_sql('SELECT * FROM tb_historico_qualidade ORDER BY data_execucao ASC', engine)
+    df_gold = pd.read_sql('SELECT * FROM gold_logistica_limpa ORDER BY order_id DESC LIMIT 15', engine)
     return df_hist, df_gold
 
-st.title("🛡️ SupplyChainGuard: Data Quality Dashboard")
-st.markdown("Monitoramento de Integridade e SLA da Cadeia de Suprimentos")
+st.title("🛡️ SupplyChainGuard: Data Observability")
+st.markdown("---")
 
 try:
     df_hist, df_gold = load_data()
-    latest = df_hist.iloc[0] # Pega a última auditoria realizada
-
-    # --- LINHA 1: Métricas de Alto Nível ---
-    col1, col2, col3 = st.columns(3)
     
-    with col1:
-        # Mostra o Score de Confiança
-        st.metric("Data Quality Score", f"{latest['score_qualidade']}%", delta="SLA Target: 90%")
-    with col2:
-        st.metric("Total de Pedidos Processados", int(latest['total_processado']))
-    with col3:
-        st.metric("Registros Aprovados (Gold)", int(latest['registros_validos']))
+    if not df_hist.empty:
+        # Pega o último score registrado
+        latest_audit = df_hist.iloc[-1]
+        score = latest_audit['score_qualidade']
+        
+        # --- ALERTA DE STATUS (A "LUZ" DO SISTEMA) ---
+        if score >= 90:
+            st.success(f"✅ **SLA COMPLIANT:** A qualidade atual dos dados é de {score}%. O sistema está operando dentro da meta.")
+        else:
+            st.error(f"🚨 **DATA QUALITY ALERT:** O score caiu para {score}%. Inconsistências críticas detectadas na origem.")
 
-    st.divider()
+        # --- LINHA 1: KPIs ---
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Current DQ Score", f"{score}%", delta=f"{score - 90:.1f}% vs Target")
+        c2.metric("Records Ingested", int(latest_audit['total_processado']))
+        c3.metric("Verified Valid", int(latest_audit['registros_validos']))
 
-    # --- LINHA 2: Visualização de Dados e Auditoria ---
-    col_left, col_right = st.columns([1, 1])
+        st.markdown("---")
 
-    with col_left:
-        st.subheader("📈 Evolução da Qualidade")
-        # Gráfico de linha mostrando o histórico de scores
-        st.line_chart(df_hist.set_index('data_execucao')['score_qualidade'])
+        # --- LINHA 2: Gráfico e Tabela ---
+        col_grafico, col_tabela = st.columns([1.3, 0.7])
 
-    with col_right:
-        st.subheader("🏆 Amostra de Dados Certificados (Gold)")
-        st.write("Dados 100% auditados e prontos para o negócio.")
-        st.dataframe(df_gold.head(10), use_container_width=True)
+        with col_grafico:
+            st.markdown("### 📈 Evolução Histórica (Confiabilidade)")
+            # Area chart para um visual preenchido e moderno
+            st.area_chart(df_hist.set_index('data_execucao')['score_qualidade'], color="#00ffcc")
+
+        with col_tabela:
+            st.markdown("### 🏆 Camada Gold (Amostra)")
+            st.write("Dados 100% auditados e prontos para o BI.")
+            st.dataframe(df_gold, use_container_width=True, hide_index=True)
+            
+    else:
+        st.info("Aguardando processamento do pipeline para exibir dados...")
 
 except Exception as e:
-    st.error(f"Erro ao carregar o dashboard: {e}")
-    st.info("Dica: Certifique-se de que o Docker está ligado e você já rodou os scripts das fases anteriores.")
+    st.error(f"Erro de conexão: {e}")
