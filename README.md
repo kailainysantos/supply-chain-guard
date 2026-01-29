@@ -2,78 +2,78 @@
 
 ![SupplyChainGuard Dashboard](dashboard_preview1.png)
 
-> *Dashboard de Observabilidade exibindo um Alerta de Qualidade (Score: 86%) e a evolução histórica da integridade dos dados.*
+> *Observability Dashboard displaying a Quality Alert (Score: 86%) and the historical evolution of data integrity.*
 
-O **SupplyChainGuard** é um projeto de Engenharia de Dados focado em **DQaaP (Data Quality as a Product)**. Ele simula um ecossistema de governança para uma empresa de logística, garantindo que apenas dados confiáveis cheguem ao usuário final. 
+**SupplyChainGuard** is a Data Engineering project focused on **DQaaP (Data Quality as a Product)**. It simulates a governance ecosystem for a logistics company, ensuring that only reliable data reaches the end user.
 
-Este projeto utiliza a **Arquitetura Medalhão** para processar e auditar registros de transporte, tratando inconsistências como pesos zerados e duplicidade de pedidos.
+This project utilizes the **Medallion Architecture** to process and audit transport records, handling inconsistencies such as zero weights and duplicate orders.
 
 ---
 
-## 🏗️ Arquitetura do Pipeline
+## 🏗️ Pipeline Architecture
 
-O projeto foi construído sobre uma infraestrutura dockerizada, seguindo o fluxo de camadas:
+The project was built upon a dockerized infrastructure, following the layer flow:
 
-| Camada | Tabela SQL | Objetivo |
+| Layer | SQL Table | Objective |
 | :--- | :--- | :--- |
-| **Bronze** | `stg_logistica` | Armazenamento de dados brutos (Staging) recém-ingeridos. |
-| **Silver** | `Auditoria` | Camada de processamento onde as regras de qualidade são aplicadas. |
-| **Gold** | `gold_logistica_limpa` | Dados certificados, higienizados e prontos para o BI/Dashboard. |
+| **Bronze** | `stg_logistica` | Storage of newly ingested raw data (Staging). |
+| **Silver** | `Auditoria` | Processing layer where quality rules are applied. |
+| **Gold** | `gold_logistica_limpa` | Certified, sanitized data ready for BI/Dashboard. |
 
 ---
 
-## ⚖️ Métrica de Data Quality (DQ Score)
+## ⚖️ Data Quality Metric (DQ Score)
 
-A confiabilidade dos dados é medida através de um algoritmo de auditoria que calcula o índice de conformidade dos registros:
+Data reliability is measured through an auditing algorithm that calculates the record compliance index:
 
-$$Score = \left( \frac{\text{Registros Válidos}}{\text{Total de Registros}} \right) \times 100$$
+$$Score = \left( \frac{\text{Valid Records}}{\text{Total Records}} \right) \times 100$$
 
-Se o Score de Confiança cair abaixo de **90%**, o sistema emite um alerta de integridade (como visto na imagem acima), garantindo a governança do produto de dados.
+If the Trust Score falls below **90%**, the system issues an integrity alert (as seen in the image above), ensuring data product governance.
 
 ---
 
-## 🛠️ Tecnologias e Ferramentas
+## 🛠️ Technologies & Tools
 
-* **Linguagem:** Python 3.x (Pandas, SQLAlchemy).
-* **Banco de Dados:** PostgreSQL 13 (Docker).
-* **Infraestrutura:** Docker & Docker Compose.
+* **Language:** Python 3.x (Pandas, SQLAlchemy).
+* **Database:** PostgreSQL 13 (Docker).
+* **Infrastructure:** Docker & Docker Compose.
 * **Frontend/Dashboard:** Streamlit.
 
 ---
 
-## 📂 Estrutura do Repositório
+## 📂 Repository Structure
 
-* `ingestion/`: Scripts de geração de dados sintéticos e carga inicial (Bronze).
-* `validation/`: O "coração" do projeto. Contém o motor de auditoria e persistência (Silver/Gold).
-* `dashboard/`: Interface visual para monitoramento das métricas de qualidade.
-* `data/`: Armazenamento local de arquivos temporários (ignorado pelo .gitignore).
+* `ingestion/`: Scripts for synthetic data generation and initial load (Bronze).
+* `validation/`: The "heart" of the project. Contains the audit engine and persistence logic (Silver/Gold).
+* `dashboard/`: Visual interface for monitoring quality metrics.
+* `data/`: Local storage for temporary files (ignored by .gitignore).
 
 ---
 
-## 🚀 Como Executar
+## 🚀 How to Run
 
-1.  **Inicie o ambiente Docker:**
+1.  **Start the Docker environment:**
     ```bash
     docker-compose up -d
     ```
 
-2.  **Gere e carregue os dados brutos:**
+2.  **Generate and load raw data:**
     ```bash
     python ingestion/supply_generator.py
     python ingestion/load_to_postgres.py
     ```
 
-3.  **Execute a auditoria e gere a Camada Gold:**
+3.  **Run the audit and generate the Gold Layer:**
     ```bash
     python validation/persistence_gold.py
     ```
 
-4.  **Inicie o Dashboard:**
+4.  **Start the Dashboard:**
     ```bash
     streamlit run dashboard/app.py
     ```
 
 ---
-Estudante de TI & Aspirante a Engenheira de Dados. Focada em transformar dados brutos em ativos de valor estratégico.
+IT Student & Aspiring Data Engineer. Focused on transforming raw data into strategic value assets.
 
 ---
