@@ -74,6 +74,3 @@ If the Trust Score falls below **90%**, the system issues an integrity alert (as
     ```
 
 ---
-IT Student & Aspiring Data Engineer. Focused on transforming raw data into strategic value assets.
-
----
