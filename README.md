@@ -10,7 +10,7 @@ This project utilizes the **Medallion Architecture** to process and audit transp
 
 ---
 
-## 🏗️ Pipeline Architecture
+##  Pipeline Architecture
 
 The project was built upon a dockerized infrastructure, following the layer flow:
 
@@ -22,7 +22,7 @@ The project was built upon a dockerized infrastructure, following the layer flow
 
 ---
 
-## ⚖️ Data Quality Metric (DQ Score)
+##  Data Quality Metric (DQ Score)
 
 Data reliability is measured through an auditing algorithm that calculates the record compliance index:
 
@@ -32,7 +32,7 @@ If the Trust Score falls below **90%**, the system issues an integrity alert (as
 
 ---
 
-## 🛠️ Technologies & Tools
+##  Technologies & Tools
 
 * **Language:** Python 3.x (Pandas, SQLAlchemy).
 * **Database:** PostgreSQL 13 (Docker).
@@ -41,7 +41,7 @@ If the Trust Score falls below **90%**, the system issues an integrity alert (as
 
 ---
 
-## 📂 Repository Structure
+##  Repository Structure
 
 * `ingestion/`: Scripts for synthetic data generation and initial load (Bronze).
 * `validation/`: The "heart" of the project. Contains the audit engine and persistence logic (Silver/Gold).
@@ -50,7 +50,7 @@ If the Trust Score falls below **90%**, the system issues an integrity alert (as
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 1.  **Start the Docker environment:**
     ```bash
